@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mainframe — Creative Agency</title>
+  <meta name="description" content="Full-screen hero landing page for creative agency Mainframe featuring mouse-scrubbed background video, A.R.I.A typewriter interface, and interactive actions." />
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/5ac3fe7c6abd2f62067f266d89671492?family=HelveticaNowDisplay-Medium" type="text/css" />
+  <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/1aa3377e489837a26d019bba501e779d?family=HelveticaNowDisplayW01-Rg" type="text/css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --font-heading: 'HelveticaNowDisplay-Medium', 'Helvetica Neue', Arial, sans-serif;
+      --font-body: 'HelveticaNowDisplayW01-Rg', 'Helvetica Neue', Arial, sans-serif;
+      --video-pos: 50% 22%;
+    }
+
+    @media (min-width: 768px) {
+      :root {
+        --video-pos: 82% 42%;
+      }
+    }
+
+    body {
+      font-family: var(--font-body);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #000;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-heading {
+      font-family: var(--font-heading);
+    }
+
+    .font-body {
+      font-family: var(--font-body);
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .animate-cursor-blink {
+      animation: cursorBlink 1s step-end infinite;
+    }
+
+    /* Video positioning */
+    .bg-video-element {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--video-pos);
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    /* Action pills entrance */
+    .action-pills-container {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .action-pills-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen w-full overflow-hidden select-none bg-black text-white">
+
+  <!-- BACKGROUND VIDEO (mouse-scrub controlled & offset to prevent text overlap) -->
+  <div id="videoContainer" class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none transition-transform duration-300">
+    <video
+      id="bgVideo"
+      src="eye_glance_fixed.gif"
+      muted
+      playsinline
+      preload="auto"
+      class="bg-video-element"
+      aria-hidden="true"
+    ></video>
+  </div>
+
+  <!-- Left-side protective gradient scrim -->
+  <div class="fixed inset-0 z-0 pointer-events-none bg-gradient-to-r from-black/85 via-black/45 to-transparent md:w-3/4" aria-hidden="true"></div>
+  <!-- Mobile bottom vignette -->
+  <div class="fixed inset-0 z-0 pointer-events-none md:hidden bg-gradient-to-t from-black/90 via-black/40 to-transparent" aria-hidden="true"></div>
+
+  <!-- NAVBAR (fixed, z-index: 10) -->
+  <header class="fixed top-0 left-0 w-full z-10 px-5 sm:px-8 py-4 sm:py-5 flex flex-row justify-between items-center">
+    <!-- Logo (left) -->
+    <a href="/" class="flex flex-row items-center gap-2.5 no-underline text-white group">
+      <span class="font-heading text-[17px] sm:text-[21px] tracking-tight text-white leading-none drop-shadow-sm">
+        Mainframe®
+      </span>
+      <span class="text-[20px] sm:text-[24px] text-white select-none leading-none inline-block transform translate-y-[-1px]" style="letter-spacing: -0.02em;" aria-hidden="true">
+        ✳︎
+      </span>
+    </a>
+
+    <!-- Desktop nav links (center, hidden below md) -->
+    <nav class="hidden md:flex flex-row items-center text-[16px] sm:text-[18px] text-white/90">
+      <a href="#labs" class="text-white hover:opacity-60 transition-opacity duration-200">Labs</a>
+      <span class="text-white/80">,&nbsp;</span>
+      <a href="#studio" class="text-white hover:opacity-60 transition-opacity duration-200">Studio</a>
+      <span class="text-white/80">,&nbsp;</span>
+      <a href="#openings" class="text-white hover:opacity-60 transition-opacity duration-200">Openings</a>
+      <span class="text-white/80">,&nbsp;</span>
+      <a href="#shop" class="text-white hover:opacity-60 transition-opacity duration-200">Shop</a>
+    </nav>
+
+    <!-- Desktop CTA (right, hidden below md) -->
+    <div class="hidden md:block">
+      <a href="mailto:hello@mainframe.co" class="text-[16px] sm:text-[18px] text-white underline underline-offset-2 hover:opacity-60 transition-opacity duration-200">
+        Get in touch
+      </a>
+    </div>
+
+    <!-- Mobile hamburger button (visible below md) -->
+    <button id="hamburgerBtn" type="button" class="md:hidden flex flex-col justify-center items-center gap-[5px] p-2 focus:outline-none cursor-pointer" aria-label="Toggle Menu" aria-expanded="false">
+      <span id="bar1" class="w-6 h-[2px] bg-white block transition-all duration-300 origin-center"></span>
+      <span id="bar2" class="w-6 h-[2px] bg-white block transition-opacity duration-300"></span>
+      <span id="bar3" class="w-6 h-[2px] bg-white block transition-all duration-300 origin-center"></span>
+    </button>
+  </header>
+
+  <!-- MOBILE OVERLAY (z-index: 9) -->
+  <div id="mobileOverlay" class="fixed inset-0 z-[9] bg-black/95 backdrop-blur-md md:hidden flex flex-col justify-center px-8 gap-8 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="flex flex-col gap-6">
+      <a href="#labs" class="mobile-nav-link text-[32px] font-medium text-white hover:opacity-60 transition-opacity">Labs</a>
+      <a href="#studio" class="mobile-nav-link text-[32px] font-medium text-white hover:opacity-60 transition-opacity">Studio</a>
+      <a href="#openings" class="mobile-nav-link text-[32px] font-medium text-white hover:opacity-60 transition-opacity">Openings</a>
+      <a href="#shop" class="mobile-nav-link text-[32px] font-medium text-white hover:opacity-60 transition-opacity">Shop</a>
+      <a href="mailto:hello@mainframe.co" class="mobile-nav-link text-[32px] font-medium text-white underline underline-offset-4 hover:opacity-60 transition-opacity mt-2">
+        Get in touch
+      </a>
+    </div>
+  </div>
+
+  <!-- HERO SECTION (z-index: 1) -->
+  <main class="relative z-[1] h-screen w-full flex flex-col justify-end pb-12 md:justify-center md:pb-0 px-5 sm:px-8 md:px-12 lg:px-16 overflow-hidden">
+    <div class="max-w-md lg:max-w-lg relative z-10">
+
+      <!-- 1. Blurred intro label -->
+      <div class="pointer-events-none select-none mb-3 sm:mb-4" style="font-size: clamp(13px, 1.8vw, 16px); line-height: 1.35; font-weight: 400; color: #ffffff; filter: blur(3px);">
+        Hey there, meet A.R.I.A,<br />
+        Mainframe's Adaptive Response Interface Agent
+      </div>
+
+      <!-- 2. Typewriter text -->
+      <p class="text-white mb-4 sm:mb-5 drop-shadow-sm font-normal" style="font-size: clamp(14px, 2.1vw, 18px); line-height: 1.4; min-height: 44px;">
+        <span id="typewriterText"></span>
+        <span id="cursor" class="inline-block w-[2px] h-[1em] bg-white align-middle ml-[2px] animate-cursor-blink"></span>
+      </p>
+
+      <!-- 3. Action pill buttons -->
+      <div id="actionPills" class="action-pills-container flex flex-wrap gap-y-1">
+        <button type="button" class="inline-flex items-center justify-center bg-white/10 text-white border border-white/25 rounded-full text-[11px] sm:text-[13px] px-3.5 sm:px-4 py-[0.28em] mx-[0.15em] mb-[0.35em] whitespace-nowrap cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 backdrop-blur-sm">
+          Pitch us an idea
+        </button>
+        <button type="button" class="inline-flex items-center justify-center bg-white/10 text-white border border-white/25 rounded-full text-[11px] sm:text-[13px] px-3.5 sm:px-4 py-[0.28em] mx-[0.15em] mb-[0.35em] whitespace-nowrap cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 backdrop-blur-sm">
+          Come work here
+        </button>
+        <button type="button" class="inline-flex items-center justify-center bg-white/10 text-white border border-white/25 rounded-full text-[11px] sm:text-[13px] px-3.5 sm:px-4 py-[0.28em] mx-[0.15em] mb-[0.35em] whitespace-nowrap cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 backdrop-blur-sm">
+          Send a brief hello
+        </button>
+        <button type="button" class="inline-flex items-center justify-center bg-white/10 text-white border border-white/25 rounded-full text-[11px] sm:text-[13px] px-3.5 sm:px-4 py-[0.28em] mx-[0.15em] mb-[0.35em] whitespace-nowrap cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 backdrop-blur-sm">
+          See how we operate
+        </button>
+
+        <!-- Outline pill button with copy action -->
+        <button id="copyEmailBtn" type="button" title="Click to copy email address" class="inline-flex items-center justify-center text-white bg-transparent border border-white/70 rounded-full text-[11px] sm:text-[13px] px-3.5 sm:px-4 py-[0.28em] mx-[0.15em] mb-[0.35em] whitespace-nowrap cursor-pointer gap-2 hover:bg-white hover:text-black transition-colors duration-200 group">
+          <span>
+            Reach us: <span class="underline underline-offset-1">hello@mainframe.co</span>
+          </span>
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true">
+            <rect x="1" y="1" width="7.5" height="7.5" rx="1" stroke="currentColor" stroke-width="1.1"></rect>
+            <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1" fill="transparent" stroke="currentColor" stroke-width="1.1"></rect>
+          </svg>
+          <span id="copiedFeedback" class="hidden text-[11px] uppercase tracking-wider font-mono ml-1 text-emerald-400">Copied!</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // 1. Action pills entrance animation (400ms after load)
+    setTimeout(() => {
+      const pills = document.getElementById('actionPills');
+      if (pills) pills.classList.add('visible');
+    }, 400);
+
+    // 2. Typewriter Effect
+    const fullText = "Glad you stopped in. Good taste tends to find us. Now, what are we building?";
+    const typewriterElem = document.getElementById('typewriterText');
+    const cursorElem = document.getElementById('cursor');
+    let charIndex = 0;
+
+    setTimeout(() => {
+      const typeInterval = setInterval(() => {
+        charIndex++;
+        if (typewriterElem) {
+          typewriterElem.textContent = fullText.slice(0, charIndex);
+        }
+        if (charIndex >= fullText.length) {
+          clearInterval(typeInterval);
+          if (cursorElem) cursorElem.style.display = 'none';
+        }
+      }, 38);
+    }, 600);
+
+    // 3. Mouse & Touch Video Scrubbing
+    const video = document.getElementById('bgVideo');
+    let targetTime = 0;
+    let isSeeking = false;
+    let prevX = null;
+    const SENSITIVITY = 0.8;
+
+    function handlePointerMove(clientX) {
+      if (prevX === null) {
+        prevX = clientX;
+        return;
+      }
+      const delta = clientX - prevX;
+      prevX = clientX;
+
+      if (!video || !video.duration || isNaN(video.duration)) return;
+
+      const timeOffset = (delta / window.innerWidth) * SENSITIVITY * video.duration;
+      targetTime = Math.max(0, Math.min(video.duration, targetTime + timeOffset));
+
+      if (!isSeeking) {
+        isSeeking = true;
+        video.currentTime = targetTime;
+      }
+    }
+
+    if (video) {
+      video.addEventListener('seeked', () => {
+        if (Math.abs(video.currentTime - targetTime) > 0.02) {
+          video.currentTime = targetTime;
+        } else {
+          isSeeking = false;
+        }
+      });
+
+      video.addEventListener('loadedmetadata', () => {
+        targetTime = video.currentTime || 0;
+      });
+
+      video.addEventListener('error', () => {
+        if (!video.src.includes('cloudfront.net')) {
+          video.src = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4';
+        }
+      });
+    }
+
+    window.addEventListener('mousemove', (e) => handlePointerMove(e.clientX), { passive: true });
+    window.addEventListener('mouseleave', () => { prevX = null; });
+    window.addEventListener('blur', () => { prevX = null; });
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) prevX = e.touches[0].clientX;
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX);
+    }, { passive: true });
+    window.addEventListener('touchend', () => { prevX = null; });
+
+    // 4. Mobile Menu Toggle
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let menuOpen = false;
+
+    function toggleMenu(open) {
+      menuOpen = typeof open === 'boolean' ? open : !menuOpen;
+      if (menuOpen) {
+        mobileOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        mobileOverlay.classList.add('opacity-100', 'pointer-events-auto');
+        bar1.classList.add('rotate-45', 'translate-y-[7px]');
+        bar2.classList.add('opacity-0');
+        bar3.classList.add('-rotate-45', '-translate-y-[7px]');
+      } else {
+        mobileOverlay.classList.add('opacity-0', 'pointer-events-none');
+        mobileOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+        bar1.classList.remove('rotate-45', 'translate-y-[7px]');
+        bar2.classList.remove('opacity-0');
+        bar3.classList.remove('-rotate-45', '-translate-y-[7px]');
+      }
+    }
+
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => toggleMenu());
+    }
+
+    document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+      link.addEventListener('click', () => toggleMenu(false));
+    });
+
+    // 5. Copy Email to Clipboard
+    const copyBtn = document.getElementById('copyEmailBtn');
+    const feedback = document.getElementById('copiedFeedback');
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await navigator.clipboard.writeText('hello@mainframe.co');
+          if (feedback) {
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 2000);
+          }
+        } catch {
+          const textarea = document.createElement('textarea');
+          textarea.value = 'hello@mainframe.co';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          if (feedback) {
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 2000);
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
